@@ -1,6 +1,6 @@
 module github.com/its-the-vibe/TinyUpdater
 
-go 1.24.0
+go 1.27.3
 
 require (
 	github.com/spf13/cobra v1.9.1

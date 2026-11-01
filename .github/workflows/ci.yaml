@@ -2,18 +2,15 @@ name: CI
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened, labeled]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  call-common-ci:
+    uses: its-the-vibe/.github/.github/workflows/common-ci.yaml@main
     permissions:
       contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
-          cache: true
-      - run: go test ./...
-      - run: go build ./cmd/tinyupdater
+      packages: write
+    secrets: inherit

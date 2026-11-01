@@ -4,7 +4,7 @@ build:
 	go build -o bin/tinyupdater ./cmd/tinyupdater
 
 run:
-	go run ./cmd/tinyupdater server --config config.example.yaml
+	go run ./cmd/tinyupdater server --config config.yaml
 
 test:
 	go test ./...
