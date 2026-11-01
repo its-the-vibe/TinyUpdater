@@ -3,8 +3,8 @@
 [![CI](https://github.com/its-the-vibe/TinyUpdater/actions/workflows/ci.yaml/badge.svg)](https://github.com/its-the-vibe/TinyUpdater/actions/workflows/ci.yaml)
 
 TinyUpdater is an auto-updater framework for MicroPython programs running on
-Raspberry Pi Pico W. This repository provides the initial HTTP service and CLI
-skeleton; manifest generation is a placeholder for a future iteration.
+Raspberry Pi Pico W. This repository provides an HTTP service and a CLI for
+generating file manifests.
 
 ## Requirements
 
@@ -40,12 +40,15 @@ distroless runtime and a read-only filesystem.
 ## Run the CLI
 
 ```sh
-go run ./cmd/tinyupdater manifest
+go run ./cmd/tinyupdater manifest --repo its-the-vibe/PicoPaper
 ```
 
-The `manifest` command currently prints `hello world`. Build the standalone CLI
+The `manifest` command clones the repository to
+`repositories/<owner>/<repo>` (or updates its existing `main` branch), reads
+`tinyupdater.json`, and writes a `manifest.json` containing the current short
+Git SHA and CRC32 checksums for the configured files. Build the standalone CLI
 with `make build`, then use `./bin/tinyupdater server --config config.yaml` or
-`./bin/tinyupdater manifest`.
+`./bin/tinyupdater manifest --repo owner/repo`.
 
 ## Configuration
 
