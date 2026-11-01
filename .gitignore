@@ -21,6 +21,14 @@ profile.cov
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# TinyUpdater binaries
+/bin/
+/tinyupdater
+/tinyupdater.exe
+
+# Local configuration
+/config.yaml
+
 # Go workspace file
 go.work
 go.work.sum
