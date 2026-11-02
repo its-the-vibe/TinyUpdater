@@ -57,7 +57,7 @@ func newManifestCommandWithGit(git gitRunner, getwd func() (string, error)) *cob
 				return err
 			}
 
-			if err := generateManifest(checkoutPath, name, git); err != nil {
+			if err := generateManifest(checkoutPath, repo, git); err != nil {
 				return err
 			}
 
