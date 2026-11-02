@@ -27,6 +27,14 @@ def _host():
     return TINY_UPDATER_HOST
 
 
+def _bearer_token():
+    try:
+        from secrets import TINY_UPDATER_BEARER_TOKEN
+        return TINY_UPDATER_BEARER_TOKEN
+    except ImportError:
+        return None
+
+
 def _exists(path):
     try:
         os.stat(path)
@@ -97,8 +105,15 @@ def fetch_manifest(repo, host=None):
     """Fetch and parse manifest.json for ``repo`` (https)."""
     host = host or _host()
     response = None
+    headers = {}
+    token = _bearer_token()
+    if token:
+        headers["Authorization"] = "Bearer " + token
     try:
-        response = requests.get("https://%s?repo=%s&file=manifest.json" % (host, repo))
+        response = requests.get(
+            "https://%s?repo=%s&file=manifest.json" % (host, repo),
+            headers=headers,
+        )
         if response.status_code != 200:
             raise OSError("manifest request failed: %s" % response.status_code)
         return json.loads(response.text)
@@ -112,8 +127,15 @@ def download_file(repo, name, dest, host=None):
     host = host or _host()
     response = None
     out = None
+    headers = {}
+    token = _bearer_token()
+    if token:
+        headers["Authorization"] = "Bearer " + token
     try:
-        response = requests.get("http://%s?repo=%s&file=%s" % (host, repo, name))
+        response = requests.get(
+            "http://%s?repo=%s&file=%s" % (host, repo, name),
+            headers=headers,
+        )
         if response.status_code != 200:
             raise OSError("download of %s failed: %s" % (name, response.status_code))
         _ensure_dir(dest)
