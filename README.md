@@ -45,10 +45,10 @@ go run ./cmd/tinyupdater manifest --repo its-the-vibe/PicoPaper
 
 The `manifest` command clones the repository to
 `repositories/<owner>/<repo>` (or updates its existing `main` branch), reads
-`tinyupdater.json`, and writes a `manifest.json` containing the current short
-Git SHA and CRC32 checksums for the configured files. Build the standalone CLI
-with `make build`, then use `./bin/tinyupdater server --config config.yaml` or
-`./bin/tinyupdater manifest --repo owner/repo`.
+`tinyupdater.json`, and writes a `manifest.json` containing the repository name,
+current short Git SHA, and CRC32 checksums for the configured files. Build the
+standalone CLI with `make build`, then use `./bin/tinyupdater server --config
+config.yaml` or `./bin/tinyupdater manifest --repo owner/repo`.
 
 ## Configuration
 

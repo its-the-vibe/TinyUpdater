@@ -20,8 +20,9 @@ type manifestConfig struct {
 }
 
 type manifest struct {
-	Version string         `json:"version"`
-	Files   []manifestFile `json:"files"`
+	Repository string         `json:"repository"`
+	Version    string         `json:"version"`
+	Files      []manifestFile `json:"files"`
 }
 
 type manifestFile struct {
@@ -56,7 +57,7 @@ func newManifestCommandWithGit(git gitRunner, getwd func() (string, error)) *cob
 				return err
 			}
 
-			if err := generateManifest(checkoutPath, git); err != nil {
+			if err := generateManifest(checkoutPath, name, git); err != nil {
 				return err
 			}
 
@@ -151,7 +152,7 @@ func githubRemoteMatches(remote, repo string) bool {
 		strings.EqualFold(path, repo)
 }
 
-func generateManifest(checkoutPath string, git gitRunner) error {
+func generateManifest(checkoutPath, repositoryName string, git gitRunner) error {
 	configPath := filepath.Join(checkoutPath, "tinyupdater.json")
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
@@ -213,7 +214,7 @@ func generateManifest(checkoutPath string, git gitRunner) error {
 		}
 	}
 
-	data, err := json.MarshalIndent(manifest{Version: version, Files: files}, "", "  ")
+	data, err := json.MarshalIndent(manifest{Repository: repositoryName, Version: version, Files: files}, "", "  ")
 	if err != nil {
 		return fmt.Errorf("encode manifest: %w", err)
 	}
