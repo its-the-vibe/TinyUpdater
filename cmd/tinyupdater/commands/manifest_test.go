@@ -39,7 +39,7 @@ func TestManifestCommandGeneratesManifest(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := manifest{
-		Repository: "repo",
+		Repository: "owner/repo",
 		Version:    "a1b2c3d4",
 		Files: []manifestFile{
 			{File: "main.py", CRC32: fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte("print('hello')\n")))},
