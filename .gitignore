@@ -41,3 +41,4 @@ go.work.sum
 # .vscode/
 
 /repositories
+__pycache__/
