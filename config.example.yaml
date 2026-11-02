@@ -3,3 +3,5 @@ server:
 
 allowedRepositories:
   - "<owner>/<repository>"
+
+repositoryPath: "/repositories"
