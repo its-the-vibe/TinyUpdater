@@ -8,7 +8,7 @@ import (
 
 func TestLoad(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "config.yaml")
-	if err := os.WriteFile(path, []byte("server:\n  address: 127.0.0.1:8080\n"), 0600); err != nil {
+	if err := os.WriteFile(path, []byte("server:\n  address: 127.0.0.1:8080\nallowedRepositories:\n  - owner/repo\nrepositoryPath: /repositories\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -18,6 +18,12 @@ func TestLoad(t *testing.T) {
 	}
 	if cfg.Server.Address != "127.0.0.1:8080" {
 		t.Fatalf("server.address = %q, want %q", cfg.Server.Address, "127.0.0.1:8080")
+	}
+	if len(cfg.AllowedRepositories) != 1 || cfg.AllowedRepositories[0] != "owner/repo" {
+		t.Fatalf("allowedRepositories = %#v, want [owner/repo]", cfg.AllowedRepositories)
+	}
+	if cfg.RepositoryPath != "/repositories" {
+		t.Fatalf("repositoryPath = %q, want %q", cfg.RepositoryPath, "/repositories")
 	}
 }
 

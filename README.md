@@ -33,6 +33,9 @@ make run
 The HTTP service listens on `0.0.0.0:8080` by default. Check
 `http://localhost:8080/healthz` for its health response. You can also run
 `go run ./cmd/tinyupdater server --config config.yaml`.
+Repositories listed in `allowedRepositories` are served from
+`repositoryPath` through `GET /files?repo=<owner/repo>&file=<filename>`.
+Requests can retrieve `manifest.json` and files listed by that manifest.
 
 To run it in Docker, use `docker compose up --build`. The container uses a
 distroless runtime and a read-only filesystem.
