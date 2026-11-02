@@ -11,6 +11,8 @@ type Config struct {
 	Server struct {
 		Address string `yaml:"address"`
 	} `yaml:"server"`
+	AllowedRepositories []string `yaml:"allowedRepositories"`
+	RepositoryPath      string   `yaml:"repositoryPath"`
 }
 
 func Load(path string) (Config, error) {

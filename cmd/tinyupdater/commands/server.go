@@ -20,7 +20,7 @@ func newServerCommand() *cobra.Command {
 				return err
 			}
 
-			httpServer := server.NewHTTPServer(cfg.Server.Address)
+			httpServer := server.NewHTTPServer(cfg)
 			fmt.Fprintf(cmd.OutOrStdout(), "TinyUpdater server listening on %s\n", httpServer.Addr)
 			return httpServer.ListenAndServe()
 		},
