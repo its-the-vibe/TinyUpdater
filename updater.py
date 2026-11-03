@@ -98,7 +98,7 @@ def fetch_manifest(repo, host=None):
     host = host or _host()
     response = None
     try:
-        response = requests.get("https://%s?repo=%s&file=manifest.json" % (host, repo))
+        response = requests.get("http://%s?repo=%s&file=manifest.json" % (host, repo))
         if response.status_code != 200:
             raise OSError("manifest request failed: %s" % response.status_code)
         return json.loads(response.text)
