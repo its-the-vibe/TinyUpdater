@@ -80,7 +80,7 @@ def file_crc32(path):
             if not chunk:
                 break
             crc = binascii.crc32(chunk, crc)
-    return format(crc & 0xFFFFFFFF, "08x")
+    return "{:08x}".format(crc & 0xFFFFFFFF)
 
 
 def get_local_version():
