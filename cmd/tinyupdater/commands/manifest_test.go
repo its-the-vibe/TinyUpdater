@@ -19,6 +19,10 @@ func TestManifestCommandGeneratesManifest(t *testing.T) {
 		"main.py":          "print('hello')\n",
 		"lib/util.py":      "VALUE = 42\n",
 	})
+	updaterSource := "def check_for_updates():\n    return True\n"
+	if err := os.WriteFile(filepath.Join(root, "updater.py"), []byte(updaterSource), 0600); err != nil {
+		t.Fatal(err)
+	}
 	command := newManifestCommandWithGit(git, func() (string, error) {
 		return root, nil
 	})
@@ -44,10 +48,18 @@ func TestManifestCommandGeneratesManifest(t *testing.T) {
 		Files: []manifestFile{
 			{File: "main.py", CRC32: fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte("print('hello')\n")))},
 			{File: "lib/util.py", CRC32: fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte("VALUE = 42\n")))},
+			{File: "lib/updater.py", CRC32: fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte(updaterSource)))},
 		},
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest = %#v, want %#v", got, want)
+	}
+	installedUpdater, err := os.ReadFile(filepath.Join(root, "repositories", "owner", "repo", "lib", "updater.py"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(installedUpdater) != updaterSource {
+		t.Fatalf("installed updater = %q, want %q", installedUpdater, updaterSource)
 	}
 	if !strings.Contains(output.String(), "Generated manifest at ") {
 		t.Fatalf("unexpected command output %q", output.String())
@@ -61,6 +73,9 @@ func TestManifestCommandPullsExistingMain(t *testing.T) {
 	root := t.TempDir()
 	checkoutPath := filepath.Join(root, "repositories", "owner", "repo")
 	if err := os.MkdirAll(checkoutPath, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "updater.py"), []byte("pass\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(checkoutPath, "tinyupdater.json"), []byte(`{"files":[]}`), 0600); err != nil {

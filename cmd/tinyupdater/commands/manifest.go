@@ -30,6 +30,8 @@ type manifestFile struct {
 	CRC32 string `json:"crc32"`
 }
 
+const updaterManifestPath = "lib/updater.py"
+
 func newManifestCommand() *cobra.Command {
 	return newManifestCommandWithGit(runGit, os.Getwd)
 }
@@ -57,7 +59,7 @@ func newManifestCommandWithGit(git gitRunner, getwd func() (string, error)) *cob
 				return err
 			}
 
-			if err := generateManifest(checkoutPath, repo, git); err != nil {
+			if err := generateManifest(checkoutPath, repo, filepath.Join(workingDirectory, "updater.py"), git); err != nil {
 				return err
 			}
 
@@ -152,7 +154,7 @@ func githubRemoteMatches(remote, repo string) bool {
 		strings.EqualFold(path, repo)
 }
 
-func generateManifest(checkoutPath, repositoryName string, git gitRunner) error {
+func generateManifest(checkoutPath, repositoryName, updaterSourcePath string, git gitRunner) error {
 	configPath := filepath.Join(checkoutPath, "tinyupdater.json")
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
@@ -174,6 +176,20 @@ func generateManifest(checkoutPath, repositoryName string, git gitRunner) error 
 	if err != nil {
 		return fmt.Errorf("resolve repository directory: %w", err)
 	}
+	if err := installUpdater(checkoutPath, resolvedRoot, updaterSourcePath); err != nil {
+		return err
+	}
+	hasUpdater := false
+	for _, name := range config.Files {
+		if name == updaterManifestPath {
+			hasUpdater = true
+			break
+		}
+	}
+	if !hasUpdater {
+		config.Files = append(config.Files, updaterManifestPath)
+	}
+
 	files := make([]manifestFile, 0, len(config.Files))
 	for _, name := range config.Files {
 		localName := filepath.FromSlash(name)
@@ -228,6 +244,36 @@ func generateManifest(checkoutPath, repositoryName string, git gitRunner) error 
 	}
 	if err := os.WriteFile(manifestPath, data, 0644); err != nil {
 		return fmt.Errorf("write manifest: %w", err)
+	}
+	return nil
+}
+
+func installUpdater(checkoutPath, resolvedRoot, updaterSourcePath string) error {
+	source, err := os.ReadFile(updaterSourcePath)
+	if err != nil {
+		return fmt.Errorf("read updater source %s: %w", updaterSourcePath, err)
+	}
+
+	targetPath := filepath.Join(checkoutPath, filepath.FromSlash(updaterManifestPath))
+	targetDir := filepath.Dir(targetPath)
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return fmt.Errorf("create updater directory: %w", err)
+	}
+	resolvedDir, err := filepath.EvalSymlinks(targetDir)
+	if err != nil {
+		return fmt.Errorf("resolve updater directory: %w", err)
+	}
+	relativeDir, err := filepath.Rel(resolvedRoot, resolvedDir)
+	if err != nil || relativeDir == ".." || strings.HasPrefix(relativeDir, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("updater directory resolves outside the repository")
+	}
+	if info, err := os.Lstat(targetPath); err == nil && info.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("updater path %s is a symlink", targetPath)
+	} else if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("inspect updater path: %w", err)
+	}
+	if err := os.WriteFile(targetPath, source, 0644); err != nil {
+		return fmt.Errorf("write updater file: %w", err)
 	}
 	return nil
 }
