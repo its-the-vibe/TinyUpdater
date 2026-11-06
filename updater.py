@@ -172,11 +172,11 @@ def check_for_updates(repo, host=None, reboot=True, log=print):
         remote_version = manifest["version"]
         files = manifest["files"]
     except Exception as e:
-        log("TinyUpdater: manifest check failed:", e)
+        log(f"TinyUpdater: manifest check failed: {e}")
         return False
 
     if remote_version == get_local_version():
-        log("TinyUpdater: up to date (%s)" % remote_version)
+        log(f"TinyUpdater: up to date ({remote_version})")
         return False
 
     staged = []  # (staging_path, production_path)
@@ -194,7 +194,7 @@ def check_for_updates(repo, host=None, reboot=True, log=print):
             if file_crc32(staging) != expected:
                 raise ValueError("CRC32 mismatch for %s" % name)
     except Exception as e:
-        log("TinyUpdater: update aborted:", e)
+        log(f"TinyUpdater: update aborted: {e}")
         _cleanup([s for s, _ in staged])
         return False
 
@@ -204,7 +204,7 @@ def check_for_updates(repo, host=None, reboot=True, log=print):
             os.remove(name)
         os.rename(staging, name)
     _save_version(remote_version)
-    log("TinyUpdater: updated to %s" % remote_version)
+    log(f"TinyUpdater: updated to {remote_version}")
 
     if reboot:
         import machine
