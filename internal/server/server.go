@@ -132,6 +132,7 @@ func serveFile(w http.ResponseWriter, r *http.Request, cfg config.Config) {
 	w.Header().Set("Content-Type", contentType)
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(data)
+	fmt.Printf("Served file: %s from repository: %s\n", name, repository)
 }
 
 func validRepositoryComponent(component string) bool {
